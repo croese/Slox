@@ -64,7 +64,11 @@ public class Scanner {
         case "\n": line += 1
         case "\"": string()
         default:
-            Slox.error(line: line, message: "Unexpected character.")
+            if c.isNumber {
+                number()
+            } else {
+                Slox.error(line: line, message: "Unexpected character.")
+            }
         }
     }
     
@@ -100,6 +104,13 @@ public class Scanner {
         return source[current]
     }
     
+    private func peekNext() -> Character {
+        if current + 1 >= source.count {
+            return "\0"
+        }
+        return source[current + 1]
+    }
+    
     private func string() {
         while peek() != "\"" && !isAtEnd {
             if peek() == "\n" {
@@ -117,6 +128,23 @@ public class Scanner {
         
         let text = source.substring(startIndex: start + 1, exclusiveEndIndex: current - 1)
         addToken(type: .string, literal: text)
+    }
+    
+    private func number() {
+        while peek().isNumber {
+            advance()
+        }
+        
+        if peek() == "." && peekNext().isNumber {
+            advance()
+            
+            while peek().isNumber {
+                advance()
+            }
+        }
+        
+        addToken(type: .number,
+                 literal: Double(source.substring(startIndex: start, exclusiveEndIndex: current)))
     }
 }
 
