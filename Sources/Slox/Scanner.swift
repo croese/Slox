@@ -14,6 +14,25 @@ public class Scanner {
     private var current = 0
     private var line = 1
     
+    private static let keywords = [
+        "and": TokenType.and,
+        "class": .class,
+        "else": .else,
+        "false": .false,
+        "for": .for,
+        "fun": .fun,
+        "if": .if,
+        "nil": .nil,
+        "or": .or,
+        "print": .print,
+        "return": .return,
+        "super": .super,
+        "this": .this,
+        "true": .true,
+        "var": .var,
+        "while": .while
+    ]
+    
     private var isAtEnd: Bool {
         return current >= source.count
     }
@@ -66,6 +85,8 @@ public class Scanner {
         default:
             if c.isNumber {
                 number()
+            } else if isAlpha(c) {
+                identifier()
             } else {
                 Slox.error(line: line, message: "Unexpected character.")
             }
@@ -145,6 +166,26 @@ public class Scanner {
         
         addToken(type: .number,
                  literal: Double(source.substring(startIndex: start, exclusiveEndIndex: current)))
+    }
+    
+    private func isAlpha(_ c: Character) -> Bool {
+        return (c >= "a" && c <= "z") ||
+        (c >= "A" && c <= "Z") ||
+        c == "_"
+    }
+    
+    private func isAlphaNumeric(_ c: Character) -> Bool {
+        return isAlpha(c) || c.isNumber
+    }
+    
+    private func identifier() {
+        while isAlphaNumeric(peek()) {
+            advance()
+        }
+        
+        let text = source.substring(startIndex: start, exclusiveEndIndex: current)
+        let type = Scanner.keywords[text] ?? .identifier
+        addToken(type: type)
     }
 }
 
