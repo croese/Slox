@@ -10,6 +10,7 @@ import Foundation
 public final class Slox {
     private let arguments: [String]
     static var hadError = false;
+    static var hadRuntimeError = false
     
     public init(arguments: [String] = CommandLine.arguments) {
         self.arguments = arguments
@@ -46,6 +47,9 @@ public final class Slox {
         if Slox.hadError {
             exit(65)
         }
+        if Slox.hadRuntimeError {
+            exit(70)
+        }
     }
     
     private func run(_ source: String) {
@@ -58,7 +62,7 @@ public final class Slox {
             return
         }
         
-        print(printExpr(expr: expr!))
+        interpret(expr: expr!)
     }
     
     static func error(line: Int, message: String) {
@@ -73,6 +77,11 @@ public final class Slox {
         }
     }
     
+    static func runtimeError(error: RuntimeError) {
+        fputs("\(error.message)\n[line \(error.token.line)]\n", stderr)
+        hadRuntimeError = true
+    }
+    
     private static func report(line: Int, location: String, message: String) {
         fputs("[line \(line)] Error\(location): \(message)\n", stderr)
         hadError = true
@@ -84,3 +93,6 @@ public extension Slox {
         case badUsage
     }
 }
+
+
+
