@@ -56,13 +56,13 @@ public final class Slox {
         let scanner = Scanner(source: source)
         let tokens = scanner.scanTokens()
         let parser = Parser(tokens: tokens)
-        let expr = parser.parse()
+        let statements = parser.parse()
         
         if Slox.hadError {
             return
         }
         
-        interpret(expr: expr!)
+        interpret(statements: statements)
     }
     
     static func error(line: Int, message: String) {

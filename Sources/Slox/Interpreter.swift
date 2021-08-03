@@ -17,14 +17,25 @@ public struct RuntimeError: Error {
     }
 }
 
-public func interpret(expr: Expr) {
+public func interpret(statements: [Stmt]) {
     do {
-        let value = try evaluate(expr: expr)
-        print(stringify(object: value))
+        for stmt in statements {
+            try execute(stmt)
+        }
     } catch let error as RuntimeError {
         Slox.runtimeError(error: error)
     } catch {
         fatalError("Unknown error: \(error.localizedDescription)")
+    }
+}
+
+fileprivate func execute(_ stmt: Stmt) throws {
+    switch stmt {
+    case .print(let expr):
+        let value = try evaluate(expr: expr)
+        print(stringify(object: value))
+    case .expression(let expr):
+        try evaluate(expr: expr)
     }
 }
 
