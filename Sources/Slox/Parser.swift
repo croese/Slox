@@ -20,16 +20,36 @@ public class Parser {
     }
     
     public func parse() -> [Stmt] {
-        do {
-            var statements = [Stmt]()
-            while !isAtEnd {
-                statements.append(try statement())
-            }
-            
-            return statements
-        } catch {
-            return []
+        var statements = [Stmt]()
+        while !isAtEnd {
+            statements.append(declaration())
         }
+        
+        return statements
+    }
+    
+    private func declaration() -> Stmt {
+        do {
+            if match(.var) {
+                return try varDeclaration()
+            }
+            return try statement()
+        } catch {
+            synchronize()
+            return .empty
+        }
+    }
+    
+    private func varDeclaration() throws -> Stmt {
+        let name = try consume(type: .identifier, message: "Expect variable name.")
+        
+        var initializer: Expr?
+        if match(.equal) {
+            initializer = try expression()
+        }
+        
+        try consume(type: .semicolon, message: "Expect ';' after variable declaration.")
+        return .var(name: name, initializer: initializer)
     }
     
     private func statement() throws -> Stmt {
@@ -72,6 +92,7 @@ public class Parser {
         return peek().type == type
     }
     
+    @discardableResult
     private func advance() -> Token {
         if !isAtEnd {
             current += 1
@@ -154,6 +175,10 @@ public class Parser {
             return .literal(value: previous().literal)
         }
         
+        if match(.identifier) {
+            return .variable(name: previous())
+        }
+        
         if match(.leftParen) {
             let expr = try expression()
             try consume(type: .rightParen, message: "Expect ')' after expression.")
@@ -163,6 +188,7 @@ public class Parser {
         throw error(token: peek(), message: "Expect expression.")
     }
     
+    @discardableResult
     private func consume(type: TokenType, message: String) throws -> Token {
         if check(type) {
             return advance()
@@ -191,7 +217,7 @@ public class Parser {
             case .print: fallthrough
             case .return: fallthrough
             case .var: fallthrough
-            case .while: fallthrough
+            case .while: 
                 return
             default: break
             }

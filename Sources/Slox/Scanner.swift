@@ -93,6 +93,7 @@ public class Scanner {
         }
     }
     
+    @discardableResult
     private func advance() -> Character {
         let c = source[current]
         current += 1

@@ -11,6 +11,7 @@ public final class Slox {
     private let arguments: [String]
     static var hadError = false;
     static var hadRuntimeError = false
+    private let interpreter = Interpreter()
     
     public init(arguments: [String] = CommandLine.arguments) {
         self.arguments = arguments
@@ -62,7 +63,7 @@ public final class Slox {
             return
         }
         
-        interpret(statements: statements)
+        interpreter.interpret(statements: statements)
     }
     
     static func error(line: Int, message: String) {
