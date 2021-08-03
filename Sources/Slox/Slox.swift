@@ -51,14 +51,26 @@ public final class Slox {
     private func run(_ source: String) {
         let scanner = Scanner(source: source)
         let tokens = scanner.scanTokens()
+        let parser = Parser(tokens: tokens)
+        let expr = parser.parse()
         
-        for t in tokens {
-            print(t)
+        if Slox.hadError {
+            return
         }
+        
+        print(printExpr(expr: expr!))
     }
     
     static func error(line: Int, message: String) {
         report(line: line, location: "", message: message)
+    }
+    
+    static func error(token: Token, message: String) {
+        if token.type == .eof {
+            report(line: token.line, location: " at end", message: message)
+        } else {
+            report(line: token.line, location: " at '\(token.lexeme)'", message: message)
+        }
     }
     
     private static func report(line: Int, location: String, message: String) {

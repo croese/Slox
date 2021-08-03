@@ -88,7 +88,7 @@ public class Scanner {
             } else if isAlpha(c) {
                 identifier()
             } else {
-                Slox.error(line: line, message: "Unexpected character.")
+                Slox.error(line: line, message: "Unexpected character '\(c)'.")
             }
         }
     }
