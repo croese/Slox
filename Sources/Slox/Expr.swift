@@ -13,5 +13,6 @@ public indirect enum Expr {
     case literal(value: Any?)
     case unary(operator: Token, right: Expr)
     case variable(name: Token)
+    case assign(name: Token, value: Expr)
 }
 

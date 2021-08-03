@@ -21,4 +21,13 @@ public class Environment {
         
         throw RuntimeError(token: name, message: "Undefined variable '\(name.lexeme)'.")
     }
+    
+    public func assign(name: Token, value: Any?) throws {
+        if values.keys.contains(name.lexeme) {
+            values[name.lexeme] = value
+            return
+        }
+        
+        throw RuntimeError(token: name, message: "Undefined variable '\(name.lexeme)'.")
+    }
 }

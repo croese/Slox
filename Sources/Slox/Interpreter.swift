@@ -123,6 +123,10 @@ public class Interpreter {
             default: return nil
             }
         case .variable(name: let name): return try environment.get(name: name)
+        case .assign(let name, let value):
+            let value = try evaluate(expr: value)
+            try environment.assign(name: name, value: value)
+            return value
         }
     }
     

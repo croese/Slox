@@ -72,7 +72,7 @@ public class Parser {
     }
     
     private func expression() throws -> Expr {
-        return try equality()
+        return try assignment()
     }
     
     private func match(_ types: TokenType...) -> Bool {
@@ -106,6 +106,23 @@ public class Parser {
     
     private func previous() -> Token {
         return tokens[current - 1]
+    }
+    
+    private func assignment() throws -> Expr {
+        let expr = try equality()
+        
+        if match(.equal) {
+            let equals = previous()
+            let value = try assignment()
+            
+            switch expr {
+            case .variable(let name): return .assign(name: name, value: value)
+            default:
+                error(token: equals, message: "Invalid assignment target.")
+            }
+        }
+        
+        return expr
     }
     
     private func equality() throws -> Expr {
@@ -197,6 +214,7 @@ public class Parser {
         throw error(token: peek(), message: message)
     }
     
+    @discardableResult
     private func error(token: Token, message: String) -> Parser.Error {
         Slox.error(token: token, message: message)
         return .parsingError
