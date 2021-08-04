@@ -50,6 +50,12 @@ public class Interpreter {
             environment.define(name: name.lexeme, value: value)
         case .block(let statements): try executeBlock(statements: statements,
                                                   environment: Environment(enclosing: self.environment))
+        case .if(let condition, let thenBranch, let elseBranch):
+            if isTruthy(try evaluate(expr: condition)) {
+                try execute(thenBranch)
+            } else if let el = elseBranch {
+                try execute(el)
+            }
         }
     }
     

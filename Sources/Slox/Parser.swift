@@ -53,6 +53,10 @@ public class Parser {
     }
     
     private func statement() throws -> Stmt {
+        if match(.if) {
+            return try ifStatement()
+        }
+        
         if match(.print) {
             return try printStatement()
         }
@@ -61,6 +65,20 @@ public class Parser {
             return .block(statements: try block())
         }
         return try expressionStatement()
+    }
+    
+    private func ifStatement() throws -> Stmt {
+        try consume(type: .leftParen, message: "Expect '(' after 'if'.")
+        let condition = try expression()
+        try consume(type: .rightParen, message: "Expect ')' after if condition.")
+        
+        let thenBranch = try statement()
+        var elseBranch: Stmt?
+        if match(.else) {
+            elseBranch = try statement()
+        }
+        
+        return .if(condition: condition, thenBranch: thenBranch, elseBranch: elseBranch)
     }
     
     private func printStatement() throws -> Stmt {

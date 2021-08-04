@@ -23,3 +23,26 @@ var a = 1;
   var a = a + 2;
   print a;
 }
+
+if (2 < 3) {
+  print "2 is less than 3";
+} else {
+  print "math is broken";
+}
+
+if (false) {
+  print "wrong!";
+} else {
+  print "false is false";
+}
+
+if (false) {
+  print "wrong!";
+} else if (2 == 2) {
+  print "else if works";
+} else {
+  print "wrong!";
+}
+
+
+if (true) if (false) print "wrong!"; else print "dangling else";
