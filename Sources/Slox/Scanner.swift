@@ -153,20 +153,20 @@ public class Scanner {
     }
     
     private func number() {
-        while peek().isNumber {
+        while peek().isNumber || peek() == "_" {
             advance()
         }
         
         if peek() == "." && peekNext().isNumber {
             advance()
             
-            while peek().isNumber {
+            while peek().isNumber || peek() == "_" {
                 advance()
             }
         }
         
         addToken(type: .number,
-                 literal: Double(source.substring(startIndex: start, exclusiveEndIndex: current)))
+                 literal: Double(source.substring(startIndex: start, exclusiveEndIndex: current).filter({ $0.isNumber })))
     }
     
     private func isAlpha(_ c: Character) -> Bool {
