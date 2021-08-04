@@ -10,11 +10,10 @@ import Foundation
 public struct RuntimeError: Error {
     let token: Token
     let message: String
-    
-    init(token: Token, message: String) {
-        self.token = token
-        self.message = message
-    }
+}
+
+private struct BreakStatement: Error {
+    let breakToken: Token
 }
 
 public class Interpreter {
@@ -28,6 +27,9 @@ public class Interpreter {
             }
         } catch let error as RuntimeError {
             Slox.runtimeError(error: error)
+        } catch let error as BreakStatement {
+            Slox.runtimeError(error: RuntimeError(token: error.breakToken,
+                                                  message: "Break statements can only appear within a loop."))
         } catch {
             fatalError("Unknown error: \(error.localizedDescription)")
         }
@@ -58,8 +60,14 @@ public class Interpreter {
             }
         case .while(let condition, let body):
             while isTruthy(try evaluate(expr: condition)) {
-                try execute(body)
+                do {
+                    try execute(body)
+                } catch is BreakStatement {
+                    break
+                }
             }
+        case .break(let token):
+            throw BreakStatement(breakToken: token)
         }
     }
     

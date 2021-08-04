@@ -46,6 +46,7 @@ enum TokenType {
     case `true`
     case `var`
     case `while`
+    case `break`
     case eof
     
 }

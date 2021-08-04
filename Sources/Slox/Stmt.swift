@@ -15,4 +15,5 @@ public indirect enum Stmt {
     case block(statements: [Stmt])
     case `if`(condition: Expr, thenBranch: Stmt, elseBranch: Stmt?)
     case `while`(condition: Expr, body: Stmt)
+    case `break`(token: Token)
 }

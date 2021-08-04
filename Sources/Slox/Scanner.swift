@@ -30,7 +30,8 @@ public class Scanner {
         "this": .this,
         "true": .true,
         "var": .var,
-        "while": .while
+        "while": .while,
+        "break": .break
     ]
     
     private var isAtEnd: Bool {

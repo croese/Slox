@@ -53,6 +53,11 @@ public class Parser {
     }
     
     private func statement() throws -> Stmt {
+        if match(.break) {
+            try consume(type: .semicolon, message: "Expect ';' after 'break'.")
+            return .break(token: previous())
+        }
+        
         if match(.for) {
             return try forStatement()
         }
