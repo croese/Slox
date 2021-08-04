@@ -148,6 +148,18 @@ public class Interpreter {
             let value = try evaluate(expr: value)
             try environment.assign(name: name, value: value)
             return value
+        case .logical(let left, let op, let right):
+            let left = try evaluate(expr: left)
+            if op.type == .or {
+                if isTruthy(left) {
+                    return left
+                }
+            } else {
+                if !isTruthy(left) {
+                    return left
+                }
+            }
+            return try evaluate(expr: right)
         }
     }
     
