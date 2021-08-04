@@ -56,6 +56,10 @@ public class Parser {
         if match(.print) {
             return try printStatement()
         }
+        
+        if match(.leftBrace) {
+            return .block(statements: try block())
+        }
         return try expressionStatement()
     }
     
@@ -63,6 +67,17 @@ public class Parser {
         let value = try expression()
         try consume(type: .semicolon, message: "Expect ';' after value.")
         return .print(expr: value)
+    }
+    
+    private func block() throws -> [Stmt] {
+        var statements = [Stmt]()
+        
+        while !check(.rightBrace) && !isAtEnd {
+            statements.append(declaration())
+        }
+        
+        try consume(type: .rightBrace, message: "Expect '}' after block.")
+        return statements
     }
     
     private func expressionStatement() throws -> Stmt {

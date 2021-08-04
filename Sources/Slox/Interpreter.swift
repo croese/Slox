@@ -19,7 +19,7 @@ public struct RuntimeError: Error {
 
 public class Interpreter {
     
-    private let environment = Environment()
+    private var environment = Environment()
     
     public func interpret(statements: [Stmt]) {
         do {
@@ -48,6 +48,21 @@ public class Interpreter {
             }
             
             environment.define(name: name.lexeme, value: value)
+        case .block(let statements): try executeBlock(statements: statements,
+                                                  environment: Environment(enclosing: self.environment))
+        }
+    }
+    
+    private func executeBlock(statements: [Stmt], environment: Environment) throws {
+        let previous = self.environment
+        
+        defer {
+            self.environment = previous
+        }
+        
+        self.environment = environment
+        for stmt in statements {
+            try execute(stmt)
         }
     }
     

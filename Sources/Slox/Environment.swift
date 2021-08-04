@@ -8,7 +8,16 @@
 import Foundation
 
 public class Environment {
+    let enclosing: Environment?
     private var values = [String : Any?]()
+    
+    init() {
+        self.enclosing = nil
+    }
+    
+    init(enclosing: Environment) {
+        self.enclosing = enclosing
+    }
     
     public func define(name: String, value: Any?) {
         values[name] = value
@@ -19,12 +28,21 @@ public class Environment {
             return value
         }
         
+        if let parent = enclosing {
+            return try parent.get(name: name)
+        }
+        
         throw RuntimeError(token: name, message: "Undefined variable '\(name.lexeme)'.")
     }
     
     public func assign(name: Token, value: Any?) throws {
         if values.keys.contains(name.lexeme) {
             values[name.lexeme] = value
+            return
+        }
+        
+        if let parent = enclosing {
+            try parent.assign(name: name, value: value)
             return
         }
         

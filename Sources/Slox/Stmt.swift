@@ -12,4 +12,5 @@ public enum Stmt {
     case expression(expr: Expr)
     case print(expr: Expr)
     case `var`(name: Token, initializer: Expr?)
+    case block(statements: [Stmt])
 }

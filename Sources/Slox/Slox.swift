@@ -33,9 +33,15 @@ public final class Slox {
         while true {
             print("> ", terminator: "")
             let line = readLine(strippingNewline: true)
-            guard let line = line else {
+            guard var line = line?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) else {
                 break
             }
+            
+            if !line.hasSuffix(";") {
+                // expression with no semicolon was entered
+                line = "print \(line);"
+            }
+            
             run(line)
             Slox.hadError = false
         }
