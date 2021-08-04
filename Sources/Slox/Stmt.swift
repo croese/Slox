@@ -14,4 +14,5 @@ public indirect enum Stmt {
     case `var`(name: Token, initializer: Expr?)
     case block(statements: [Stmt])
     case `if`(condition: Expr, thenBranch: Stmt, elseBranch: Stmt?)
+    case `while`(condition: Expr, body: Stmt)
 }

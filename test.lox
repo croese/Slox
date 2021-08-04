@@ -50,3 +50,8 @@ if (true) if (false) print "wrong!"; else print "dangling else";
 print "hi" or 2;
 print nil or "yes";
 
+var i = 0;
+while (i < 10) {
+  print i;
+  i = i + 1;
+}
