@@ -16,9 +16,23 @@ private struct BreakStatement: Error {
     let breakToken: Token
 }
 
+public struct Return: Error {
+    let value: Any?
+    
+    init(value: Any?) {
+        self.value = value
+    }
+}
+
 public class Interpreter {
     
-    private var environment = Environment()
+    public let globals = Environment()
+    private var environment: Environment!
+    
+    init() {
+        environment = globals
+        globals.define(name: "clock", value: LoxClockBuiltin())
+    }
     
     public func interpret(statements: [Stmt]) {
         do {
@@ -68,10 +82,19 @@ public class Interpreter {
             }
         case .break(let token):
             throw BreakStatement(breakToken: token)
+        case .function(let name, let params, let body):
+            let function = LoxFunction(name: name.lexeme, params: params, body: body, closure: environment)
+            environment.define(name: name.lexeme, value: function)
+        case .return(keyword: _, value: let value):
+            var result: Any?
+            if let v = value {
+                result = try evaluate(expr: v)
+            }
+            throw Return(value: result)
         }
     }
     
-    private func executeBlock(statements: [Stmt], environment: Environment) throws {
+    internal func executeBlock(statements: [Stmt], environment: Environment) throws {
         let previous = self.environment
         
         defer {
@@ -172,6 +195,23 @@ public class Interpreter {
                 }
             }
             return try evaluate(expr: right)
+        case .call(let callee, let paren, let arguments):
+            let callee = try evaluate(expr: callee)
+            
+            let argValues = try arguments.map({ try evaluate(expr: $0) })
+            
+            guard let function = callee as? LoxCallable else {
+                throw RuntimeError(token: paren, message: "Can only call functions and classes.")
+            }
+            
+            if arguments.count != function.arity {
+                throw RuntimeError(token: paren,
+                                   message: "Expected \(function.arity) arguments but got \(arguments.count).")
+            }
+            
+            return try function.call(interpreter: self, arguments: argValues)
+        case .funLiteral(token: let token, params: let params, body: let body):
+            return LoxFunction(name: "anon_func_line_\(token.line)", params: params, body: body, closure: environment)
         }
     }
     
